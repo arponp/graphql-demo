@@ -13,7 +13,7 @@ import { books } from "./books";
 
 const app = express();
 
-const AuthorType = new GraphQLObjectType({
+const AuthorType: GraphQLObjectType = new GraphQLObjectType({
   name: "Author",
   description: "This represents the author of a book",
   fields: () => ({
@@ -23,10 +23,16 @@ const AuthorType = new GraphQLObjectType({
     name: {
       type: GraphQLNonNull(GraphQLString),
     },
+    books: {
+      type: new GraphQLList(BookType),
+      resolve: (author) => {
+        return books.filter((book) => book.authorId == author.id);
+      },
+    },
   }),
 });
 
-const BookType = new GraphQLObjectType({
+const BookType: GraphQLObjectType = new GraphQLObjectType({
   name: "Book",
   description: "This represents a book written by an author",
   fields: () => ({
@@ -52,6 +58,11 @@ const RootQueryType = new GraphQLObjectType({
       type: new GraphQLList(BookType),
       description: "List of All Books",
       resolve: () => books,
+    },
+    authors: {
+      type: new GraphQLList(AuthorType),
+      description: "List of All Authors",
+      resolve: () => authors,
     },
   }),
 });
