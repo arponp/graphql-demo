@@ -8,9 +8,23 @@ import {
   GraphQLInt,
   GraphQLNonNull,
 } from "graphql";
+import { authors } from "./authors";
 import { books } from "./books";
 
 const app = express();
+
+const AuthorType = new GraphQLObjectType({
+  name: "Author",
+  description: "This represents the author of a book",
+  fields: () => ({
+    id: {
+      type: GraphQLNonNull(GraphQLInt),
+    },
+    name: {
+      type: GraphQLNonNull(GraphQLString),
+    },
+  }),
+});
 
 const BookType = new GraphQLObjectType({
   name: "Book",
@@ -21,6 +35,12 @@ const BookType = new GraphQLObjectType({
     },
     name: { type: GraphQLNonNull(GraphQLString) },
     authorId: { type: GraphQLNonNull(GraphQLInt) },
+    author: {
+      type: AuthorType,
+      resolve: (book) => {
+        return authors.find((author) => author.id == book.authorId);
+      },
+    },
   }),
 });
 
